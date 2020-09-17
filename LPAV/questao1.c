@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <string.h>
 
 //gcc -o teste questao1.c
 //  ./teste arquivo.txt
@@ -92,33 +93,25 @@ bool lista_eventos_adicionar_ordenado(evento_t *evento, lista_eventos_t **lista)
 void lista_eventos_listar(lista_eventos_t *lista){
 	lista_eventos_t *aux = lista;
 	while (aux != NULL){
-		printf("alvo%d\n", aux->evento->alvo);
+		printf("tempo: %3.6lf, alvo:%d, tipo:%d\n", aux->evento->tempo, aux->evento->alvo, aux->evento->tipo);
 		aux = aux->prox;
 	}
 }
 
+
+evento_t* criar_evento(double tempo, int alvo, int tipo) {
+    evento_t *evento = malloc(sizeof(evento_t));
+	evento->tempo = tempo;
+	evento->alvo = alvo;
+	evento->tipo = tipo;
+    return evento;
+}
+
 int main(int argc, char *argv[1]){
-	evento_t *d = malloc(sizeof(evento_t)); // declara as struct
-	lista_eventos_t *l = NULL;				// declara as struct
-
-	evento_t *d2 = malloc(sizeof(evento_t));
-
-	d->alvo = 1;
-	d->tempo = 1.54;
-	d->tipo = 4;
-
-	lista_eventos_adicionar_fim(d, &l);
-	d2->alvo = 3;
-	d2->tempo = 4.37;
-	d2->tipo = 1;
-
-	//lista_eventos_adicionar_inicio(d, &l);
-	lista_eventos_adicionar_fim(d2, &l);
-
-	//lista_eventos_adicionar_ordenado()
-	//lista_eventos_listar(l);
-
-	/*
+	// declara a lista de o struct
+	lista_eventos_t *l = NULL;
+	evento_t *e;
+	
 	FILE *fp = NULL;
 	fp = fopen(argv[1], "r+");
 	if(fp == NULL){
@@ -129,12 +122,10 @@ int main(int argc, char *argv[1]){
 	double tempo;
 	int alvo, tipo;
 	while (fscanf(fp, "%lf %d %d", &tempo, &alvo, &tipo) != EOF){ // le o arquivo pelo terminal
-		d->alvo = alvo;
-		d->alvo = tempo;
-		d->alvo = tipo;
+		e = criar_evento(tempo, alvo, tipo);
+		//lista_eventos_adicionar_inicio(e, &l);
+		//lista_eventos_adicionar_fim(e, &l);
+		//lista_eventos_adicionar_ordenado(e, &l);
 	}
-	
-	//printf("%3.6lf\t%d\t%d\n", d.tempo, d.alvo, d.tipo);
-	//if (l->prox->prox != NULL) printf("0");
-	//lista_eventos_listar(l);*/
+	lista_eventos_listar(l);
 }
