@@ -39,8 +39,7 @@ bool lista_eventos_adicionar_inicio(evento_t *evento, lista_eventos_t **lista)
 }
 
 //segunda questao
-bool lista_eventos_adicionar_fim(evento_t *evento, lista_eventos_t **lista)
-{
+bool lista_eventos_adicionar_fim(evento_t *evento, lista_eventos_t **lista){
 	lista_eventos_t *item_novo = malloc(sizeof(lista_eventos_t));
 	lista_eventos_t *aux = *lista;
 	if (item_novo == NULL)
@@ -48,14 +47,11 @@ bool lista_eventos_adicionar_fim(evento_t *evento, lista_eventos_t **lista)
 	item_novo->evento = evento;
 	item_novo->prox = NULL;
 
-	if (*lista == NULL)
-	{
+	if (*lista == NULL){
 		*lista = item_novo;
 	}
-	else
-	{
-		while (aux->prox != NULL)
-		{
+	else{
+		while (aux->prox != NULL){
 			aux = aux->prox;
 		}
 		aux->prox = item_novo;
@@ -63,19 +59,15 @@ bool lista_eventos_adicionar_fim(evento_t *evento, lista_eventos_t **lista)
 }
 
 //terceira questao
-bool lista_eventos_adicionar_ordenado(evento_t *evento, lista_eventos_t **lista)
-{
+bool lista_eventos_adicionar_ordenado(evento_t *evento, lista_eventos_t **lista){
 
-	if (*lista == NULL || (*lista)->evento->tempo > evento->tempo)
-	{
+	if (*lista == NULL || (*lista)->evento->tempo > evento->tempo){
 		return lista_eventos_adicionar_inicio(evento, lista);
 	}
-	else if ((*lista)->prox == NULL)
-	{
+	else if ((*lista)->prox == NULL){
 		return lista_eventos_adicionar_fim(evento, lista);
 	}
-	else
-	{
+	else{
 		lista_eventos_t *aux = *lista;
 		while (aux->prox != NULL && aux->prox->evento->tempo < evento->tempo){
 			aux = aux->prox;
