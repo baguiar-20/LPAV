@@ -4,12 +4,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-//gcc -o teste questao1.c
+//gcc -o teste tp1.c
 //  ./teste arquivo.txt
 
 //struct para os dados
-struct evento_t
-{
+struct evento_t{
 	double tempo;
 	int alvo;
 	int tipo;
@@ -18,17 +17,15 @@ struct evento_t
 typedef struct evento_t evento_t;
 
 //struct para a lista encadeada
-struct lista_eventos_t
-{
+struct lista_eventos_t{
 	evento_t *evento;
 	struct lista_eventos_t *prox;
 };
 
 typedef struct lista_eventos_t lista_eventos_t;
 
-//primeira questao ok
-bool lista_eventos_adicionar_inicio(evento_t *evento, lista_eventos_t **lista)
-{
+//primeira questao 
+bool lista_eventos_adicionar_inicio(evento_t *evento, lista_eventos_t **lista){
 	lista_eventos_t *item_novo = malloc(sizeof(lista_eventos_t)); // Aloca o novo item
 	if (item_novo == NULL)
 		return false;			// Falta memória?
@@ -80,12 +77,12 @@ bool lista_eventos_adicionar_ordenado(evento_t *evento, lista_eventos_t **lista)
 	}
 }
 
-//item_atual->proximo != NULL && item_atual->proximo->evento->tempo < evento->tempo
+//questao1
 
 void lista_eventos_listar(lista_eventos_t *lista){
 	lista_eventos_t *aux = lista;
 	while (aux != NULL){
-		printf("tempo: %3.6lf, alvo:%d, tipo:%d\n", aux->evento->tempo, aux->evento->alvo, aux->evento->tipo);
+		printf("%3.6lf\t%d\t%d\n", aux->evento->tempo, aux->evento->alvo, aux->evento->tipo);
 		aux = aux->prox;
 	}
 }
@@ -113,11 +110,11 @@ int main(int argc, char *argv[1]){
 
 	double tempo;
 	int alvo, tipo;
-	while (fscanf(fp, "%lf %d %d", &tempo, &alvo, &tipo) != EOF){ // le o arquivo pelo terminal
+	while (fscanf(fp,"%lf\t%d\t%d\n", &tempo, &alvo, &tipo) != EOF){ // le o arquivo pelo terminal
 		e = criar_evento(tempo, alvo, tipo);
 		//lista_eventos_adicionar_inicio(e, &l);
 		//lista_eventos_adicionar_fim(e, &l);
-		//lista_eventos_adicionar_ordenado(e, &l);
+		lista_eventos_adicionar_ordenado(e, &l);
 	}
 	lista_eventos_listar(l);
 }
