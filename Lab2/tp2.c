@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+int tabela_hash_tam;
+
 //gcc -o teste tp1.c
 //  ./teste arquivo.txt
 
@@ -24,23 +26,18 @@ struct lista_pessoas{
 
 typedef struct lista_pessoas lista_pessoas;
 
+//hash
+
 typedef lista_pessoas ** tabela_hash;
 
-/////////////////////////
-///Hash
+///////////funcoes lista encadeada///////////
 
-
-
-
-
-//////////////////////
-
-bool lista_eventos_adicionar_fim(evento_t *evento, lista_eventos_t **lista){
-	lista_eventos_t *item_novo = malloc(sizeof(lista_eventos_t));
-	lista_eventos_t *aux = *lista;
+bool lista_eventos_adicionar_fim(dado_pessoa *pessoa, lista_pessoas **lista){
+	lista_pessoas *item_novo = malloc(sizeof(lista_pessoas));
+	lista_pessoas *aux = *lista;
 	if (item_novo == NULL) return false;
 	
-	item_novo->evento = evento;
+	item_novo->pessoa = pessoa;
 	item_novo->prox = NULL;
 
 	if (*lista == NULL){
@@ -54,68 +51,97 @@ bool lista_eventos_adicionar_fim(evento_t *evento, lista_eventos_t **lista){
 	}
 }
 
-
-//questao1
-
-void lista_eventos_listar(lista_eventos_t *lista){
-	lista_eventos_t *aux = lista;
+void lista_eventos_listar(lista_pessoas *lista){
+	lista_pessoas *aux = lista;
 	while (aux != NULL){
-		printf("%3.6lf\t%d\t%d\n", aux->evento->tempo, aux->evento->alvo, aux->evento->tipo);
+		printf("%s\t%lld\t%d\n",aux->pessoa->nome, aux->pessoa->cpf, aux->pessoa->idade);
 		aux = aux->prox;
 	}
 }
 
 
-dado_pessoa* criar_evento(char nome, long long int cpf, int idade) {
+dado_pessoa* criar_pessoa(char nome[50], long long int cpf, int idade) {
     dado_pessoa *pessoa = malloc(sizeof(dado_pessoa));
-	if(pessoa == NULL) return 1;
-	pessoa->cpf = cpf;
-	pessoa->idade = idade;
-	pessoa->nome = nome;
+	if(pessoa == NULL) printf("foi n");
+	//pessoa->cpf = cpf;
+	//pessoa->idade = idade;
+	//strcpy(pessoa->nome, nome);
     return pessoa;
 }
-/////////////////////////
+////////////funcoes hash/////////////
 
-tabela_hash tabela_hash_pessoas_criar(tabela_hash *tabela_hash){
-	int i;
- 	for(i = 0; i < tabela_hash_tam; i++){
-  		tabela_hash[i] = NULL;
+tabela_hash **tabela_hash_pessoas_criar(){ //falha de segmentação?
+	tabela_hash **tab = (tabela_hash **)malloc(sizeof(tabela_hash*)*tabela_hash_tam);
+ 	for(int i = 0; i < tabela_hash_tam; i++){
+  		tab[i] = NULL;
  	}
-}
-int funcao_hash(lista_pessoas *pessoa){
-  return(tabela_hash_tam %  pessoa->pessoa->cpf);
+	 return tab;
 }
 
-bool tabela_hash_pessoas_adicionar(lista_pessoas *pessoa, tabela_hash tabela_hash){
-	int posicao = funcao_hash(pessoa);
-	tabela_hash[posicao] = &pessoa;
+int funcao_hash(dado_pessoa *dp){
+  return(dp->cpf % tabela_hash_tam);
 }
 
 
 
+bool tabela_hash_pessoas_adicionar(dado_pessoa *dp, tabela_hash tabela_hash){
+	int key = funcao_hash(dp);
+	//dado_pessoa *aux = tabela_hash[key];
+	tabela_hash[key]->pessoa = dp;
+	return true;
+}
+
+/////////////////////////////
+/*bool tabela_hash_pessoas_adicionar(dado_pessoa *dp, tabela_hash tabela_hash){
+ int i = 0;
+ int chave = funcaoHash(num);
+ Dados* aux = tab[chave];
+ while(aux != NULL)
+ {
+  if(aux->info == num)
+  {
+   break;
+  }
+  aux = aux->prox;
+ }
+ if(aux == NULL)
+ {
+  aux = (Dados*)malloc(sizeof(Dados));
+  aux->info = num;
+  aux->prox = tab[chave];
+  tab[chave] = aux;
+ }
+}
+*/
 ////////////////////////
 
 
 int main(int argc, char *argv[1]){
 	// declara a lista de o struct
-	lista_pessoas *p = NULL;
+	lista_pessoas *lp = NULL;
 	dado_pessoa *dp;
-	
-	FILE *fp = NULL;
+	tabela_hash tab = tabela_hash_pessoas_criar();
 
+	FILE *fp = NULL;
 	fp = fopen(argv[2], "r+");
 	if(fp == NULL){
 		printf("arquivo nao existe!\n");
 		return 1;
 	}
-	int tabela_hash_tamç = atoi(argv[1]);
-	double tempo;
-	int alvo, tipo;
-	while (fscanf(fp,"%lf\t%d\t%d\n", &tempo, &alvo, &tipo) != EOF){ // le o arquivo pelo terminal
-		e = criar_evento(tempo, alvo, tipo);
-		//lista_eventos_adicionar_inicio(e, &l);
-		//lista_eventos_adicionar_fim(e, &l);
-		lista_eventos_adicionar_ordenado(e, &l);
+	tabela_hash_tam = atoi(argv[1]);
+	printf("%d", tabela_hash_tam);
+	
+	char nome[50];
+	int idade;
+	long long int cpf;
+
+	while (fscanf(fp,"%50[^\t]%lld\t%d\n", nome, &cpf, &idade) != EOF){ // le o arquivo pelo terminal
+		dp = criar_pessoa(nome, cpf, idade);
+		
+		//lista_eventos_adicionar_fim(dp, &lp);
+		//printf("%s\t%lld\t%d\n", dp->nome, dp->cpf, dp->idade);
+		tabela_hash_pessoas_adicionar(dp, tab);
+		
 	}
-	lista_eventos_listar(l);
+	//lista_eventos_listar(p);
 }
