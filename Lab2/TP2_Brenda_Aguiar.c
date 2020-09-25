@@ -30,9 +30,10 @@ typedef struct lista_pessoas lista_pessoas;
 
 typedef lista_pessoas tabela_hash;
 
-///////////funcoes lista encadeada///////////
+///////////funcoes lista encadeada//////////
 
-bool lista_eventos_adicionar_fim(dado_pessoa *pessoa, lista_pessoas **lista){
+//adiciona na lista encadeada
+bool lista_pessoas_adicionar(dado_pessoa *pessoa, lista_pessoas **lista){
 	lista_pessoas *item_novo = malloc(sizeof(lista_pessoas));
 	lista_pessoas *aux = *lista;
 	if (item_novo == NULL) return false;
@@ -51,21 +52,22 @@ bool lista_eventos_adicionar_fim(dado_pessoa *pessoa, lista_pessoas **lista){
 	}
 }
 
+//lista a lista encadeada
 void lista_eventos_listar(lista_pessoas *lista){
 	lista_pessoas *aux = lista;
 	while (aux != NULL){
-		printf("%s\t%lld\t%d\n",aux->pessoa->nome, aux->pessoa->cpf, aux->pessoa->idade);
+		printf("-%s\t%lld\t%d\n",aux->pessoa->nome, aux->pessoa->cpf, aux->pessoa->idade);
 		aux = aux->prox;
 	}
 }
 
-
+//cria um tipo pessoa
 dado_pessoa* criar_pessoa(char nome[50], long long int cpf, int idade) {
-    dado_pessoa *pessoa = malloc(sizeof(dado_pessoa));
+    dado_pessoa *pessoa = (dado_pessoa*)malloc(sizeof(dado_pessoa));
 	if(pessoa == NULL) printf("foi n");
 	pessoa->cpf = cpf;
 	pessoa->idade = idade;
-	//strcpy(pessoa->nome, nome);
+	strcpy(pessoa->nome, nome);
     return pessoa;
 }
 ////////////funcoes hash/////////////
@@ -80,6 +82,8 @@ tabela_hash **tabela_hash_pessoas_criar(){
 	 return tab;
 }
 
+
+//funcao hash
 int funcao_hash(dado_pessoa *dp){
   return(dp->cpf % tabela_hash_tam);
 }
@@ -89,17 +93,17 @@ int funcao_hash(dado_pessoa *dp){
 bool tabela_hash_pessoas_adicionar(dado_pessoa *dp, tabela_hash **tab){
 	int key = funcao_hash(dp);
 	
-	//tabela_hash **aux = tab[key];
+	lista_pessoas_adicionar(dp, &tab[key]);
 	
-	lista_eventos_adicionar_fim(dp, &tab[key]);
-	 // fazer que a posicao da tabela hash receba o endereco da lista encadeada
 	return true;
 }
 
+//lista as pessoas da hash
 
 void tabela_hash_pessoas_listar(tabela_hash **tab){
 
 	for (int i=0; i< tabela_hash_tam; i++){
+		printf("POSIÇÃO %d DA TABELA HASH\n", i);
 		lista_eventos_listar(tab[i]);
 	}
 
@@ -108,33 +112,27 @@ void tabela_hash_pessoas_listar(tabela_hash **tab){
 ////////////////////////////////////////////////////
 
 
-int main(int argc, char *argv[1]){
-	// declara a lista de o struct
-	lista_pessoas *lp = NULL;
+int main(int argc, char *argv[]){
+
 	dado_pessoa *dp;
+	tabela_hash_tam = atoi(argv[1]);
 	tabela_hash **tab = tabela_hash_pessoas_criar();
 	
 	FILE *fp = NULL;
 	fp = fopen(argv[2], "r+");
+
 	if(fp == NULL){
 		printf("arquivo nao existe!\n");
 		return 1;
 	}
-	tabela_hash_tam = atoi(argv[1]);
-	printf("%d", tabela_hash_tam);
-	
-	char nome[50];
-	int idade;
-	long long int cpf;
 
-	while (fscanf(fp,"%50[^\t]%lld\t%d\n", nome, &cpf, &idade) != EOF){ // le o arquivo pelo terminal
+	char nome[50];
+	int idade=0;
+	long long int cpf=0;
+
+	while(fscanf(fp,"%50[^\t]\t%lld\t%d\n", nome, &cpf, &idade) != EOF){ // le o arquivo pelo terminal
 		dp = criar_pessoa(nome, cpf, idade);
-		
-		//lista_eventos_adicionar_fim(dp, &lp);
-		//printf("%s\t%lld\t%d\n", dp->nome, dp->cpf, dp->idade);
 		tabela_hash_pessoas_adicionar(dp, tab);
-		
 	}
-	//lista_eventos_listar(p);
 	tabela_hash_pessoas_listar(tab);
 }
