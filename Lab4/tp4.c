@@ -193,22 +193,26 @@ void imprimir_grafo(grafo_t * grafo){
 }
 /////
 
-void simulacao_iniciar(lista_eventos_t *lista, grafo_t *grafo){
-    lista_eventos_t *aux = lista;
+void simulacao_iniciar(lista_eventos_t *lista_eventos, grafo_t *grafo){
+    lista_eventos_t *aux = lista_eventos;
     int i = 0;
     while (aux != NULL){
         evento_t *prim_evento = aux->evento;
-        lista = aux->prox;
+        lista_eventos = aux->prox;
         printf("[%3.6f] Nó %d recebeu pacote.\n", prim_evento->tempo, prim_evento->alvo);
 
         if(grafo->lista[prim_evento->alvo]->dado_vertice->pacote_enviado != true){
             lista_vizinhos_listar(grafo->lista[prim_evento->alvo]);
             
-            evento_t *e = criar_evento(prim_evento->tempo + (0.1 + (grafo->lista[prim_evento->alvo]->dado_vertice->id * 0.01)), grafo->lista[prim_evento->alvo]->dado_vertice->id, 1);
+            printf("%d ", grafo->lista[prim_evento->alvo]->dado_vertice->id);
+
+            evento_t *e = criar_evento(prim_evento->tempo + (0.1 + (grafo->lista[prim_evento->alvo]->proximo->dado_vertice->id * 0.01)), grafo->lista[prim_evento->alvo]->proximo->dado_vertice->id, 1); // tempo, alvo, tipo
             
-            lista_eventos_adicionar_ordenado(e, &lista);
+
+            lista_eventos_adicionar_ordenado(e, &aux);
             grafo->lista[prim_evento->alvo]->dado_vertice->pacote_enviado = true;
         }
+        //printf("%d ", aux->evento->alvo);
         aux = aux->prox;
     }
 }
