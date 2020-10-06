@@ -1,19 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
 #include <math.h>
 
 
 
-
+//// dado dos vertice
 typedef struct dado_vertice{
    int id;
    double pos_x;
    double pos_y;
 }dado_vertice;
 
-
+/// lista
  struct lista_vizinhos_t{
     dado_vertice *dado_vertice;
     struct lista_vizinhos_t *proximo;
@@ -21,7 +20,7 @@ typedef struct dado_vertice{
 };
 typedef struct lista_vizinhos_t lista_vizinhos_t;
 
-
+/////grafo
 typedef struct grafo_t{
     lista_vizinhos_t **lista;
     int tamanho;
@@ -29,16 +28,16 @@ typedef struct grafo_t{
 
 
 /////////////////////////////////////////
-
+////// criar um grafo
 grafo_t * criar_grafo(int tam){ ///ok
     grafo_t *grafo = (grafo_t *)malloc(sizeof(grafo_t));
-    grafo->lista = calloc(tam, sizeof(lista_vizinhos_t*));
+    grafo->lista = calloc(tam, sizeof(lista_vizinhos_t*)); /// alocar o vetor de ponteiros do grafo com calloc
     grafo->tamanho = tam;
     return grafo;
 }
 ////////////////////////////////////////////////
 
-
+//// alocar um dado vertice
 dado_vertice * vertice(int id, double pos_x, double pos_y){
     dado_vertice *novo_dado_vertice = malloc(sizeof(dado_vertice));
 
@@ -49,22 +48,48 @@ dado_vertice * vertice(int id, double pos_x, double pos_y){
     
     return novo_dado_vertice;
 }
-
+///////// adicionar os dados do vertice no inicio da lista
 bool lista_vizinhos_adicionar_inicio(dado_vertice *dv, lista_vizinhos_t **lista){
-	lista_vizinhos_t *item_novo = malloc(sizeof(lista_vizinhos_t)); // Aloca o novo item
-	if (item_novo == NULL)
-		return false;			// Falta memória?
-	item_novo->dado_vertice = dv; // Seta o novo item
-	item_novo->proximo = *lista;	// O próximo do novo item será a lista
-	*lista = item_novo;		// Aqui, estamos mudando o ponteiro da lista
+	lista_vizinhos_t *item_novo = malloc(sizeof(lista_vizinhos_t)); 
+	if (item_novo == NULL) return false;			
+	item_novo->dado_vertice = dv; 
+	item_novo->proximo = *lista;
+	*lista = item_novo;		
 	return true;
 }
-///
+//// funcoes de adicionar os dados no grafo e atualizar os vizinhos do grafo //////////
 void adicionar_grafo(grafo_t *grafo, dado_vertice *vertice, int pos){
     lista_vizinhos_adicionar_inicio(vertice, &grafo->lista[pos]);
 }
 
+void atualizar_grafo(grafo_t *grafo, dado_vertice *vertice, int pos){
+    lista_vizinhos_adicionar_inicio(vertice, &grafo->lista[pos]->proximo);
+}
+//////////////
 
+///////////// atualiza os vizinhos do grafo /////////////////////
+void atualizar_vizinho(grafo_t *grafo, int raio_comunicacao){
+    double calculo;
+    for(int i=0; i < grafo->tamanho;i++){
+        for(int j=0; j < grafo->tamanho; j++){
+            
+            if(j != i){
+                calculo = sqrt(pow(grafo->lista[i]->dado_vertice->pos_x - grafo->lista[j]->dado_vertice->pos_x, 2) +
+            pow(grafo->lista[i]->dado_vertice->pos_y - grafo->lista[j]->dado_vertice->pos_y, 2));
+                if(calculo < raio_comunicacao){
+                    dado_vertice *novo_vertice = malloc(sizeof(dado_vertice));
+                    novo_vertice->id = j;
+                    novo_vertice->pos_x = grafo->lista[j]->dado_vertice->pos_x;
+                    novo_vertice->pos_y = grafo->lista[j]->dado_vertice->pos_y;
+                    atualizar_grafo(grafo, novo_vertice, i);
+                }
+            }
+        }
+    }
+
+}
+
+/////// imprimir as listas do grafo///////
 
 void lista_vizinhos_listar(lista_vizinhos_t *lista){
 	lista_vizinhos_t *aux = lista->proximo;
@@ -82,9 +107,7 @@ void imprimir_grafo(grafo_t * grafo){
     }
 
 }
-void atualizar_grafo(grafo_t *grafo, dado_vertice *vertice, int pos){
-    lista_vizinhos_adicionar_inicio(vertice, &grafo->lista[pos]->proximo);
-}
+
 
 
 
@@ -109,26 +132,7 @@ int main(int argc, char *argv[1]){
         adicionar_grafo(grafo, dv, id);  
    
     }
-
-    double calculo;
-    for(int i=0; i < grafo->tamanho;i++){
-        for(int j=0; j < grafo->tamanho; j++){
-            
-            if(j != i){
-                calculo = sqrt(pow(grafo->lista[i]->dado_vertice->pos_x - grafo->lista[j]->dado_vertice->pos_x, 2) +
-            pow(grafo->lista[i]->dado_vertice->pos_y - grafo->lista[j]->dado_vertice->pos_y, 2));
-            //printf("%d %d %lf\n", i, j, calculo);
-                if(calculo < raio_comunicacao){
-                    //printf("se do calculo i =%d j= %d calculo =%lf\n", i, j, calculo);
-                    dado_vertice *novo_vertice = malloc(sizeof(dado_vertice));
-                    novo_vertice->id = j;
-                    novo_vertice->pos_x = grafo->lista[j]->dado_vertice->pos_x;
-                    novo_vertice->pos_y = grafo->lista[j]->dado_vertice->pos_y;
-                    atualizar_grafo(grafo, novo_vertice, i);
-                }
-            }
-        }
-    }
+    atualizar_vizinho(grafo, raio_comunicacao);
 
     imprimir_grafo(grafo);
 
