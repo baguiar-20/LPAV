@@ -7,7 +7,7 @@
 
 
 
-///lista de eventos ordenados
+//////////*dados do evento*//////////////
 struct evento_t{
 	double tempo;
 	int alvo;
@@ -16,7 +16,7 @@ struct evento_t{
 
 typedef struct evento_t evento_t;
 
-//struct para a lista encadeada
+//////////*struct para a lista encadeada*//////////////
 struct lista_eventos_t{
 	evento_t *evento;
 	struct lista_eventos_t *prox;
@@ -25,6 +25,32 @@ struct lista_eventos_t{
 typedef struct lista_eventos_t lista_eventos_t;
 
 
+////*dado dos vertice ou no *///////
+typedef struct dado_vertice{
+   int id;
+   double pos_x;
+   double pos_y;
+   bool pacote_enviado;
+}dado_vertice;
+
+///// lista ////////
+ struct lista_vizinhos_t{
+    dado_vertice *dado_vertice;
+    struct lista_vizinhos_t *proximo;
+    
+};
+typedef struct lista_vizinhos_t lista_vizinhos_t;
+
+/////grafo //////
+typedef struct grafo_t{
+    lista_vizinhos_t **lista;
+    int tamanho;
+}grafo_t;
+
+
+
+
+///////// funcoes TP1 ///////////
 
 evento_t* criar_evento(double tempo, int alvo, int tipo) {
     evento_t *evento = malloc(sizeof(evento_t));
@@ -88,33 +114,12 @@ bool lista_eventos_adicionar_ordenado(evento_t *evento, lista_eventos_t **lista)
 
 
 
-//// dado dos vertice
-typedef struct dado_vertice{
-   int id;
-   double pos_x;
-   double pos_y;
-   bool pacote_enviado;
-}dado_vertice;
-
-/// lista
- struct lista_vizinhos_t{
-    dado_vertice *dado_vertice;
-    struct lista_vizinhos_t *proximo;
-    
-};
-typedef struct lista_vizinhos_t lista_vizinhos_t;
-
-/////grafo
-typedef struct grafo_t{
-    lista_vizinhos_t **lista;
-    int tamanho;
-}grafo_t;
-
 
 
 
 ///////////////////////////////////////////////////////
 
+////////// funcoes TP3 ///////////
 bool lista_vizinhos_adicionar_inicio(dado_vertice *dv, lista_vizinhos_t **lista){
 	lista_vizinhos_t *item_novo = malloc(sizeof(lista_vizinhos_t)); 
 	if (item_novo == NULL) return false;			
@@ -173,52 +178,37 @@ void atualizar_vizinho(grafo_t *grafo, int raio_comunicacao){
 
 }
 
-/////// imprimir as listas do grafo///////
 
-void lista_vizinhos_listar(lista_vizinhos_t *lista){
-	lista_vizinhos_t *aux = lista->proximo;
-	while (aux != NULL){
-		printf("\t--> Repassando pacote para o nó %d ...\n", aux->dado_vertice->id);
-		aux = aux->proximo;
-	}
-    printf("\n");
-}
 
-void imprimir_grafo(grafo_t * grafo){
-    for(int i = 0;i<grafo->tamanho; i++){
-        printf("NO %d: ", i);
-        lista_vizinhos_listar(grafo->lista[i]);
-    }
-
-}
-/////
+////////////// TP4 ///////////////////
 
 void simulacao_iniciar(lista_eventos_t *lista_eventos, grafo_t *grafo){
-    lista_eventos_t *aux = lista_eventos;
-    int i = 0;
-    while (aux != NULL){
-        evento_t *prim_evento = aux->evento;
-        lista_eventos = aux->prox;
+    lista_eventos_t *aux_e = lista_eventos;
+    double tempo = 0;
+    while (aux_e != NULL){
+        evento_t *prim_evento = aux_e->evento;
+        lista_eventos = aux_e->prox;
+
         printf("[%3.6f] Nó %d recebeu pacote.\n", prim_evento->tempo, prim_evento->alvo);
-
+        
         if(grafo->lista[prim_evento->alvo]->dado_vertice->pacote_enviado != true){
-            lista_vizinhos_listar(grafo->lista[prim_evento->alvo]);
-            
-            printf("%d ", grafo->lista[prim_evento->alvo]->dado_vertice->id);
-
-            evento_t *e = criar_evento(prim_evento->tempo + (0.1 + (grafo->lista[prim_evento->alvo]->proximo->dado_vertice->id * 0.01)), grafo->lista[prim_evento->alvo]->proximo->dado_vertice->id, 1); // tempo, alvo, tipo
-            
-
-            lista_eventos_adicionar_ordenado(e, &aux);
+            lista_vizinhos_t *aux_v = grafo->lista[prim_evento->alvo]->proximo;
+            while (aux_v !=NULL){
+                printf("\t--> Repassando pacote para o nó %d ...\n", aux_v->dado_vertice->id);
+                tempo = prim_evento->tempo + (0.1 + (grafo->lista[aux_v->dado_vertice->id]->dado_vertice->id * 0.01));
+                evento_t *e = criar_evento(tempo, grafo->lista[aux_v->dado_vertice->id]->dado_vertice->id, 1); // tempo, alvo, tipo
+                lista_eventos_adicionar_ordenado(e, &aux_e);
+                aux_v = aux_v->proximo;
+            }
             grafo->lista[prim_evento->alvo]->dado_vertice->pacote_enviado = true;
         }
-        //printf("%d ", aux->evento->alvo);
-        aux = aux->prox;
+        aux_e = aux_e->prox;
     }
 }
 
 
-
+///gcc -o teste tp4.c -lm
+///// ./teste input.txt
 
 int main(int argc, char *argv[1]){
     
@@ -242,13 +232,10 @@ int main(int argc, char *argv[1]){
     }
     atualizar_vizinho(grafo, raio_comunicacao);
 
-    //imprimir_grafo(grafo);
-
     lista_eventos_t *l = NULL;
 	evento_t *e;
     e = criar_evento(1.0, grafo->lista[0]->dado_vertice->id, 1);// tempo, alvo, tipo
     lista_eventos_adicionar_ordenado(e, &l);
-
 
     simulacao_iniciar(l, grafo);
 
