@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title> Calcula a Circunferência</title>
+</head>
+<style>
+	label {
+		float: left;
+		clear: both;
+		width: 108px;
+	}
+	input {
+		float:left;
+		margin:2px;
+	}
+	#btn {
+		padding: 8px;
+	    background: #ff4800;
+	    font-size: 11px;
+	    cursor: pointer;
+	    font-family: arial;
+	    border-radius: 2px;
+	    position: relative;
+	    float: left;
+	    margin: 0 2px;		    
+	}
+	#circulo {
+		overflow: hidden;
+		width: 100%;
+		height: 100%;
+		background: #ff4800;
+		border-radius: 50%;
+		position: absolute;
+		border: 2px solid #333;
+	}
+	#engloba {
+		position: relative;
+		float: left;
+		clear: both;
+		height: 70px;
+		width: 70px;
+		margin: 12px;
+		user-select: none;
+	}
+	.noventa {
+		width: 50%;
+		position: relative;
+		float: left;
+		height: 50%;
+	}
+	p {
+		position: absolute;
+		margin: 0;
+		padding: 0;
+		font-size: 12px;
+		text-align: center;
+		width: 100%;
+	}
+	#raio {
+		bottom: 0;
+		border-bottom: 2px solid #333;
+	}
+	#circunferencia {
+		width: fit-content;
+		bottom: 28%;
+		left: 101%;	
+	}
+	#area {
+		top: 63%;
+	}
+</style>
+<body>
+	<h3> Calculo da Circunferência </h3>
+	<h5>OBS: Para valores de Raio maiores que 150 um gráfico é exibido.</h1>
+	<form name="calcula" method="GET">
+		<label for="raio">Informe o Raio: </label>
+		<input type="text" name="raio">
+		<div id="btn" type="submit" name="envia"> Calcular</div>
+
+		<label for="area">Area do círculo: </label>
+		<input type="text" name="area" value="">
+
+		<label for="circunferencia">Circunferência: </label>
+		<input type="text" name="circunferencia">
+	</form>
+	<script>
+		var btn = document.getElementById('btn');
+		btn.onclick = function () {
+			var raio = document.calcula.raio.value;
+			var CR = 2 * Math.PI * raio; // calcucla circunferencia
+			document.calcula.circunferencia.value = parseFloat(CR.toFixed(2)); // arredonda casas decimais (2 casas)
+
+			var VR = Math.PI * Math.pow(raio, 2); // calcula area do círculo
+			document.calcula.area.value = parseFloat(VR.toFixed(2)); //arredonda resultado
+
+			var engloba = document.getElementById("engloba");
+			if(raio > 150){
+				engloba.setAttribute("style","width:"+raio+"px; height:"+raio+"px;");
+			}else{
+				engloba.setAttribute("style","display: none;");
+			}
+			
+			var pRaio = document.getElementById("raio");
+			pRaio.innerHTML = "R = "+raio;
+
+			var pCircunferencia = document.getElementById("circunferencia");
+			pCircunferencia.innerHTML = "C = "+parseFloat(CR.toFixed(2));
+
+			var pArea = document.getElementById("area");
+			pArea.innerHTML = "A = "+parseFloat(VR.toFixed(2));
+		};
+		
+	</script>
+	<div id="engloba" style="display: none;">
+		<div id="circulo" >
+			<div class="noventa"><p id="area"></p></div>
+			<div class="noventa"><p id="raio"></p></div>
+			<div class="noventa"></div>
+			<div class="noventa"></div>
+		</div>
+		<p id="circunferencia"></p>
+	</div>
+</body>
+</html>
