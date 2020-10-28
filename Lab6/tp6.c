@@ -19,10 +19,7 @@ struct zip_file_hdr {
     } __attribute__ ((packed));
 
 
-
-
-
-int main(int argc, char *argv[1]){
+int main(int argc, char *argv[]){
 
     int i =1; 
 
@@ -30,9 +27,10 @@ int main(int argc, char *argv[1]){
 
     struct zip_file_hdr *file_hdr = malloc(sizeof(struct zip_file_hdr));
 
+    
     while(zip_file){
+
         fread(file_hdr, sizeof(struct zip_file_hdr), 1, zip_file);
-        ///fseek(zip_file, file_hdr->extra_field_length +file_hdr->compressed_size, SEEK_CUR);
         
         if(file_hdr->signature == 0x04034b50){
             printf("Arquivo %d ..\n", i);
@@ -55,9 +53,5 @@ int main(int argc, char *argv[1]){
 
         i++;
     }
-
-    //free(file_hdr);
-    //fclose(zip_file);
-    
-    
+    fclose(zip_file);
 }
