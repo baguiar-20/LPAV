@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
     fseek(png_file, 8, SEEK_CUR);
     
     while(png_file){
-        printf("Lendo chunk %d\n", i);
+        printf("Lendo chunk %d:\n", i);
         fread(png_hdr, sizeof(struct png_file_hdr), 1, png_file);
         
         printf("    --> Tamanho: %d\n",  ntohl(png_hdr->tamanho));
