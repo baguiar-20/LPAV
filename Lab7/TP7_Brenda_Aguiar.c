@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <arpa/inet.h>
+//#include <arpa/inet.h>
 
  struct png_file_hdr{
     int tamanho;
