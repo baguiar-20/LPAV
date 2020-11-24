@@ -48,6 +48,9 @@ int main(int argc, char *argv[]){
     printf("Lendo Ethernet...\n");
     printf("--> MAC de Origem: %.2x: \n", ethernet_hdr->daddr);
 
+    printf("Lendo IP...\n");
+
+
 
 
 }
