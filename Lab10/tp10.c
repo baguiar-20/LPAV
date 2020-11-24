@@ -46,8 +46,10 @@ int main(int argc, char *argv[]){
     fread(ethernet_hdr, sizeof( ethernet_hdr_t), 14, tcp_ip_file);
 
     printf("Lendo Ethernet...\n");
-    printf("--> MAC de Origem: %.2x: \n", ethernet_hdr->daddr);
+    printf("--> MAC de Origem: %.2x \n", ethernet_hdr->daddr);
+    printf("--> MAC de Destino: %.2x \n", ethernet_hdr->saddr);
 
+    fread(ip_hdr, sizeof(ip_hdr_t), 14, tcp_ip_file);
     printf("Lendo IP...\n");
 
 
