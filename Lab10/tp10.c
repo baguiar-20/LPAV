@@ -9,7 +9,7 @@ struct ethernet_hdr_t{
     uint8_t  daddr[6];  // Endereco MAC de destino    
     uint8_t  saddr[6];  // Endereco MAC de origem (source)    
     uint16_t protocol;  // Protocolo da camada superior (IP!)
-} ;
+} __attribute__ ((packed));;
 
 typedef struct ip_hdr_t {    
     uint8_t  hdr_len:4,  version:4; // Tamanho do Cabeçalho, // Versão do IP   
@@ -44,24 +44,26 @@ int main(int argc, char *argv[]){
     struct ip_hdr_t  *ip_hdr = malloc(sizeof(ip_hdr_t));
     struct tcp_hdr_t  *tcp_hdr = malloc(sizeof(tcp_hdr_t));
 
-    fread(ethernet_hdr, sizeof(struct ethernet_hdr_t), 14, tcp_ip_file);
-
+    fread(ethernet_hdr, sizeof(struct ethernet_hdr_t), 1, tcp_ip_file);
     printf("Lendo Ethernet...\n");
     printf("--> MAC de Origem: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n", ethernet_hdr->daddr[0],ethernet_hdr->daddr[1], ethernet_hdr->daddr[2], ethernet_hdr->daddr[3], ethernet_hdr->daddr[4], ethernet_hdr->daddr[5]);
     printf("--> MAC de Destino: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n", ethernet_hdr->saddr[0],ethernet_hdr->saddr[1], ethernet_hdr->saddr[2], ethernet_hdr->saddr[3], ethernet_hdr->saddr[4], ethernet_hdr->saddr[5]);
 
-    fread(ip_hdr, sizeof(ip_hdr_t), 20, tcp_ip_file);
+    fread(ip_hdr, sizeof(ip_hdr_t), 1, tcp_ip_file);
     printf("Lendo IP...\n");
     printf("--> Versão do IP: %d\n", ip_hdr->version);
     printf("--> Tamanho do cabeçalho: %d bytes\n", ip_hdr->hdr_len*4);
     printf("--> Tamanho do pacote: %d bytes\n", ntohs(ip_hdr->hdr_len));
-    fseek( tcp_ip_file, ip_hdr->hdr_len*4 - sizeof(ip_hdr_t), SEEK_CUR);
+    printf("--> Endereço IP de Origem: %d.%d.%d.%d\n", ip_hdr->saddr[0],ip_hdr->saddr[1], ip_hdr->saddr[2], ip_hdr->saddr[3]);
+    printf("--> Endereço IP de Destino: %d.%d.%d.%d\n", ip_hdr->daddr[0],ip_hdr->daddr[1], ip_hdr->daddr[2], ip_hdr->daddr[3]);
+    
 
-    fread(tcp_hdr, sizeof(tcp_hdr_t), 32, tcp_ip_file);
+    fread(tcp_hdr, sizeof(tcp_hdr_t), 1, tcp_ip_file);
     printf("Lendo tcp...\n");
     printf("--> Porta de Origem: %d\n", ntohs(tcp_hdr->sport));
     printf("--> Porta de Destino: %d\n", ntohs(tcp_hdr->dport));
     printf("--> Tamanho do cabeçalho: %d bytes\n", tcp_hdr->hdr_len * 4);
+    
     fseek( tcp_ip_file, tcp_hdr->hdr_len*4 - sizeof(tcp_hdr_t), SEEK_CUR);
 
     printf("Lendo Dados (HTTP) ..\n");
@@ -71,17 +73,16 @@ int main(int argc, char *argv[]){
     
     int c, i;
     char buffer[tam_dados];
-    //printf("%d\n", fgetc(tcp_ip_file));
 
     c = fgetc(tcp_ip_file);
-    printf( "%c\n", c);
+    printf( "%c", c);
     
     for( i=0; (i < tam_dados) && ( feof( tcp_ip_file ) == 0 ); i++ ){
         buffer[i] = (char)c;
         c = fgetc(tcp_ip_file);
-        printf( "%c\n", buffer[i]);
+        printf( "%c", buffer[i]);
     }
-    //buffer[i] = '\0';
+    buffer[i] = '\0';
     //printf( "%s\n", buffer );
 
 }
